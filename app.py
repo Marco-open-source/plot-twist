@@ -45,6 +45,21 @@ def show_actions(state, scene):
             apply(logic.move, exit_name)
 
 
+def show_new_game():
+    """The New game button. It first asks "Are you sure?" and only then resets."""
+    if st.session_state.get("confirm_new_game"):
+        st.warning("Are you sure? Your progress will be lost.")
+        if st.button("Yes, start over"):
+            st.session_state["confirm_new_game"] = False
+            apply(logic.new_game, True)
+        if st.button("No, keep playing"):
+            st.session_state["confirm_new_game"] = False
+            apply(logic.new_game, False)
+    elif st.button("New game"):
+        st.session_state["confirm_new_game"] = True
+        st.rerun()
+
+
 def show_game():
     state = load_state()
     scene = story.SCENES[state["scene"]]
@@ -66,6 +81,8 @@ def show_game():
         st.write(", ".join(state["inventory"]))
     else:
         st.write("Empty")
+
+    show_new_game()
 
 
 show_game()
