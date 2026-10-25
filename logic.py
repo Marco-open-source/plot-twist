@@ -88,3 +88,37 @@ def accuse(state):
         return new, "There is nobody to accuse here."
     new["ending"] = "A" if "letter" in state["inventory"] else "B"
     return new, story.ENDINGS[new["ending"]]
+
+
+ACTIONS = {
+    "take_key": take_key,
+    "take_letter": take_letter,
+    "accuse": accuse,
+}
+
+
+def visible_hotspots(state):
+    """The clickable areas of the current scene that are possible right now. Each gets a "locked" flag."""
+    if state["ending"] is not None:
+        return []
+    visible = []
+    for hotspot in story.SCENES[state["scene"]]["hotspots"]:
+        if hotspot["action"] == "take_key" and state["drawer_emptied"]:
+            continue
+        if hotspot["action"] == "take_letter" and state["table_emptied"]:
+            continue
+        locked = False
+        if hotspot["action"] == "go":
+            needed_item = story.LOCKED_ROUTES.get(hotspot["target"])
+            locked = needed_item is not None and needed_item not in state["inventory"]
+        visible.append({**hotspot, "locked": locked})
+    return visible
+
+
+def perform(state, action, target=None):
+    """Run one action by name. The name can come from the page address, so unknown ones are rejected."""
+    if action == "go":
+        return move(state, target)
+    if action in ACTIONS:
+        return ACTIONS[action](state)
+    return _copy(state), story.UNKNOWN_ACTION_MESSAGE
