@@ -19,6 +19,8 @@ SCENES = {
         "Doors lead to the Library and the Kitchen. A heavy oak door marked Study is locked.",
         "exits": ["library", "kitchen", "study"],
         "image": "images/hall.svg",
+        "music": "lobby",
+        "ambience": None,
         "hotspots": [
             {"action": "go", "target": "library", "box": (60, 120, 130, 210), "label": "Library"},
             {"action": "go", "target": "kitchen", "box": (610, 120, 130, 210), "label": "Kitchen"},
@@ -30,6 +32,8 @@ SCENES = {
         "text": "Dusty shelves reach the ceiling. A small drawer in the reading desk looks like it might hold something.",
         "exits": ["hall"],
         "image": "images/library.svg",
+        "music": "study",
+        "ambience": None,
         "hotspots": [
             {"action": "take_key", "target": None, "box": (338, 276, 124, 48), "label": "Open the drawer"},
             {"action": "go", "target": "hall", "box": (650, 130, 108, 200), "label": "Back to the Hall"},
@@ -40,6 +44,8 @@ SCENES = {
         "text": "Copper pots hang above a cold stove. A scrubbed wooden table stands in the middle of the room.",
         "exits": ["hall"],
         "image": "images/kitchen.svg",
+        "music": "kitchen",
+        "ambience": None,
         "hotspots": [
             {"action": "take_letter", "target": None, "box": (255, 244, 290, 82), "label": "Look at the table"},
             {"action": "go", "target": "hall", "box": (40, 130, 120, 200), "label": "Back to the Hall"},
@@ -51,6 +57,8 @@ SCENES = {
         "Beyond them, the butler stands by the window.",
         "exits": ["hall", "confrontation"],
         "image": "images/study.svg",
+        "music": "study",
+        "ambience": None,
         "hotspots": [
             {"action": "go", "target": "hall", "box": (60, 130, 120, 200), "label": "Back to the Hall"},
             {"action": "go", "target": "confrontation", "box": (520, 80, 150, 255), "label": "Face the butler"},
@@ -61,12 +69,19 @@ SCENES = {
         "text": "The butler turns to face you. Everyone in the manor is listening. It is time to name the thief.",
         "exits": ["study"],
         "image": "images/confrontation.svg",
+        "music": "suspense",
+        "ambience": "murmur",
         "hotspots": [
             {"action": "accuse", "target": None, "box": (320, 48, 160, 296), "label": "Accuse the butler"},
             {"action": "go", "target": "study", "box": (30, 124, 120, 208), "label": "Back to the Study"},
         ],
     },
 }
+
+# Which sound each kind of click makes. A locked door rattles instead of opening.
+CUES = {"go": "door", "take_key": "drawer", "take_letter": "paper", "accuse": "accuse"}
+LOCKED_CUE = "locked"
+ENDING_CUES = {"A": "ending_a", "B": "ending_b"}
 
 # Routes that need an item in the inventory before the player can enter.
 LOCKED_ROUTES = {"study": "key"}
