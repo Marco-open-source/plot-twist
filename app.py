@@ -4,6 +4,7 @@ import streamlit as st
 
 import db
 import logic
+import mapview
 import story
 
 st.set_page_config(page_title="Plot Twist", page_icon="🔎")
@@ -60,12 +61,24 @@ def show_new_game():
         st.rerun()
 
 
+def handle_click():
+    """A click on the map puts ?act=...&target=... in the page address. Run it once, then clean the address."""
+    if "act" in st.query_params:
+        action = st.query_params["act"]
+        target = st.query_params.get("target")
+        st.query_params.clear()
+        apply(logic.perform, action, target)
+
+
 def show_game():
+    handle_click()
     state = load_state()
     scene = story.SCENES[state["scene"]]
 
+    st.markdown("<style>" + mapview.MAP_CSS + "</style>", unsafe_allow_html=True)
     st.title("The Missing Necklace")
     st.subheader(scene["title"])
+    st.markdown(mapview.map_html(state), unsafe_allow_html=True)
     st.write(scene["text"])
 
     if state["ending"] is not None:
@@ -74,7 +87,8 @@ def show_game():
         st.info(st.session_state["message"])
 
     if state["ending"] is None:
-        show_actions(state, scene)
+        with st.expander("Text controls"):
+            show_actions(state, scene)
 
     st.subheader("Inventory")
     if state["inventory"]:
