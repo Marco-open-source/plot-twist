@@ -4,6 +4,8 @@ START_SCENE = "hall"
 
 LOCKED_MESSAGE = "The door is locked. You need a key."
 STORY_OVER_MESSAGE = "The story is over."
+KEPT_MESSAGE = "Your progress was kept."
+NEW_GAME_MESSAGE = "A new game begins."
 
 SCENES = {
     "hall": {

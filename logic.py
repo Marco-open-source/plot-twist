@@ -20,6 +20,13 @@ def new_state():
     }
 
 
+def new_game(state, confirmed):
+    """Start over if the player confirmed. Otherwise keep everything as it is. Works after an ending too."""
+    if not confirmed:
+        return _copy(state), story.KEPT_MESSAGE
+    return new_state(), story.NEW_GAME_MESSAGE
+
+
 def _copy(state):
     return {
         "scene": state["scene"],
