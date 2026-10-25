@@ -111,8 +111,14 @@ def visible_hotspots(state):
         if hotspot["action"] == "go":
             needed_item = story.LOCKED_ROUTES.get(hotspot["target"])
             locked = needed_item is not None and needed_item not in state["inventory"]
-        visible.append({**hotspot, "locked": locked})
+        cue = story.LOCKED_CUE if locked else story.CUES[hotspot["action"]]
+        visible.append({**hotspot, "locked": locked, "cue": cue})
     return visible
+
+
+def ending_cue(state):
+    """The sound of the ending the player reached, or None while the story is still running."""
+    return story.ENDING_CUES.get(state["ending"])
 
 
 def perform(state, action, target=None):

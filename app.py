@@ -1,6 +1,9 @@
 """Plot Twist: the Streamlit screen. Start the app with:  uv run streamlit run app.py"""
 
+from pathlib import Path
+
 import streamlit as st
+import streamlit.components.v1 as components
 
 import db
 import logic
@@ -8,6 +11,9 @@ import mapview
 import story
 
 st.set_page_config(page_title="Plot Twist", page_icon="🔎")
+
+# The map is a small web page (components/map) that stays alive between clicks, so the music keeps playing.
+map_component = components.declare_component("plot_map", path=str(Path(__file__).parent / "components" / "map"))
 
 
 def load_state():
@@ -61,24 +67,20 @@ def show_new_game():
         st.rerun()
 
 
-def handle_click():
-    """A click on the map puts ?act=...&target=... in the page address. Run it once, then clean the address."""
-    if "act" in st.query_params:
-        action = st.query_params["act"]
-        target = st.query_params.get("target")
-        st.query_params.clear()
-        apply(logic.perform, action, target)
+def handle_click(click):
+    """The component returns its last click again on every rerun, so each click is run only once (by its id)."""
+    if click and click["id"] != st.session_state.get("last_click_id"):
+        st.session_state["last_click_id"] = click["id"]
+        apply(logic.perform, click["action"], click.get("target"))
 
 
 def show_game():
-    handle_click()
     state = load_state()
     scene = story.SCENES[state["scene"]]
 
-    st.markdown("<style>" + mapview.MAP_CSS + "</style>", unsafe_allow_html=True)
     st.title("The Missing Necklace")
     st.subheader(scene["title"])
-    st.markdown(mapview.map_html(state), unsafe_allow_html=True)
+    handle_click(map_component(**mapview.component_args(state), key="map", default=None))
     st.write(scene["text"])
 
     if state["ending"] is not None:

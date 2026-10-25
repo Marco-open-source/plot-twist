@@ -44,9 +44,38 @@ def _percent(value, total):
     return str(round(value / total * 100, 3)) + "%"
 
 
+def picture_data_uri(state):
+    return "data:image/svg+xml;base64," + base64.b64encode(picture_svg(state).encode()).decode()
+
+
+def component_args(state):
+    """Everything the map component needs to draw and play the current room."""
+    scene = story.SCENES[state["scene"]]
+    hotspots = []
+    for hotspot in logic.visible_hotspots(state):
+        hotspots.append({
+            "action": hotspot["action"],
+            "target": hotspot["target"],
+            "label": hotspot["label"],
+            "locked": hotspot["locked"],
+            "cue": hotspot["cue"],
+            "box": list(hotspot["box"]),
+        })
+    return {
+        "title": scene["title"],
+        "image": picture_data_uri(state),
+        "width": story.MAP_WIDTH,
+        "height": story.MAP_HEIGHT,
+        "hotspots": hotspots,
+        "music": scene["music"],
+        "ambience": scene["ambience"],
+        "ending_cue": logic.ending_cue(state),
+    }
+
+
 def map_html(state):
     """The picture of the current room with one link on top of every hotspot that is possible right now."""
-    image = "data:image/svg+xml;base64," + base64.b64encode(picture_svg(state).encode()).decode()
+    image = picture_data_uri(state)
     title = html.escape(story.SCENES[state["scene"]]["title"])
     lines = ['<div class="map">', '<img src="' + image + '" alt="' + title + '">']
     for hotspot in logic.visible_hotspots(state):
