@@ -1,0 +1,35 @@
+# ### Tests for the Shard Heist game in shard-heist/. Runs only when files in that folder change, so the
+# ### Python app (app.py, logic.py, ...) and its pytest checks are not affected.
+# ### Actions are pinned to full commit hashes (the version is in the comment).
+name: Shard Heist tests
+
+on:
+  push:
+    branches: [main]
+    paths: ['shard-heist/**', '.github/workflows/shard-heist.yml']
+  pull_request:
+    paths: ['shard-heist/**', '.github/workflows/shard-heist.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: shard-heist
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Rules, story, input and page tests
+        run: npm test
+      - name: Library integrity (SRI) check
+        run: npm run test:sri
+      - name: Browser tests (headless Chrome)
+        run: npm run test:browser
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
